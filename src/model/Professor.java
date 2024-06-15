@@ -1,10 +1,12 @@
 package model;
 
-public class Professor extends Usuario {
+import java.io.Serializable;
+
+public class Professor extends Usuario implements Serializable {
     private String departamento;
 
     public Professor(String nome, String cpf, String matricula, String dataNascimento, String departamento) {
-        super(nome, cpf, matricula, dataNascimento, TipoUsuario.PROFESSOR);
+        super(nome, cpf, matricula, dataNascimento);
         this.departamento = departamento;
     }
 

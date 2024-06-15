@@ -1,60 +1,72 @@
 # Sistema de Gerenciamento de Biblioteca
 
-Este programa em Java permite gerenciar operações básicas em uma biblioteca, como adicionar e remover livros, realizar empréstimos e devoluções, buscar livros por título ou autor, listar empréstimos ativos de usuários e cadastrar novos usuários.
+## Pré-requisitos
 
+- **Java Development Kit (JDK) instalado.** Recomendado JDK 8 ou superior.
+- **IDE Java** (recomendado IntelliJ IDEA, Eclipse, NetBeans, etc.) ou compilador Java para executar a partir da linha de comando.
+
+## Como Rodar o Programa
+
+1. Clone o repositório para sua máquina local:
+   ```bash
+   git clone https://github.com/seu-usuario/sistema-biblioteca.git
+2. Abra o projeto na sua IDE Java preferida.
+3. Compile e execute o arquivo Main.java para iniciar o programa.
 ## Funcionalidades
+### Login do Bibliotecário
+Você acessará o usuário da bibliotecária Cleide.
+- Login: admin
+- Senha: senha123
+Utilize estas credenciais para acessar o sistema.
 
 ### Adicionar Livro
-
-Permite adicionar um novo livro ao catálogo da biblioteca. São solicitadas informações como título, autor, ano de lançamento, assunto e quantidade em estoque.
-
-### Remover Livro
-
-Remove um livro existente no catálogo da biblioteca. É necessário fornecer o título do livro a ser removido.
+Permite adicionar um novo livro ao sistema, informando título, autor, assunto, ano de publicação e quantidade de cópias.
 
 ### Realizar Empréstimo
-
-Permite emprestar um livro a um usuário cadastrado na biblioteca. São solicitados o CPF do usuário e o título do livro desejado. O sistema verifica se o livro está disponível para empréstimo e se o usuário atende aos critérios de empréstimo.
+Realiza o empréstimo de um livro para um usuário, informando o título do livro e o CPF do usuário.
 
 ### Realizar Devolução
+Realiza a devolução de um livro emprestado, informando o título do livro e o CPF do usuário.
 
-Realiza a devolução de um livro emprestado. É necessário fornecer o título do livro a ser devolvido. O sistema marca o livro como disponível novamente e remove o empréstimo da lista de empréstimos ativos.
+### Pesquisar Livro por Título
+Permite pesquisar um livro no sistema pelo título.
 
-### Buscar Livro
+### Remover Livro
+Remove um livro do sistema, informando o título do livro a ser removido.
 
-Busca um livro pelo título ou autor. O sistema exibe informações detalhadas do livro encontrado ou informa se o livro não está no catálogo.
+### Verificar Situação do Usuário por CPF
+Verifica a situação de um usuário no sistema, informando o CPF do usuário.
 
-### Listar Empréstimos Ativos de um Usuário
+### Listar Empréstimos Ativos de um Usuário por CPF
+Lista os empréstimos ativos de um usuário, informando o CPF do usuário.
 
-Exibe todos os empréstimos ativos de um usuário, identificado pelo CPF. Se o usuário não tiver empréstimos ativos, o sistema informa que não há empréstimos registrados para esse usuário.
+## Programação
+### Arquivo binário
+Utiliza-se um arquivo binário para armazenar os dados, houveram dificuldades nessa etapa.
 
-### Cadastrar Usuário
+### Enumerações
+O enum foi utilizado para indicar a disponibilidade do livro.
 
-Permite cadastrar novos usuários na biblioteca. É necessário especificar o tipo de usuário (Estudante, Professor ou Bibliotecário) e fornecer informações pessoais como nome, CPF, matrícula, data de nascimento, e, para o caso de professores e bibliotecários, o departamento ou login/senha, respectivamente.
+### Herança
+Foi utilizada a Herança entre Pessoa, Usuário, Estudante, Bibliotecário e Professor.
 
-## Também na busca do livro tem-se a opção de leitura de arquivo .txt
+### Collections
+ArrayList e List
 
-- **Busca de Livro por Nome em Arquivo .txt**
-    - Adicionamos a capacidade de buscar livros pelo nome em um arquivo `.txt` contendo uma lista de títulos de livros. O usuário fornece o nome do arquivo e o título do livro desejado. O sistema verifica o arquivo e retorna informações básicas do livro encontrado, se aplicável.
+### LocalDate
+Foi utilizado para as datas dos empréstimos
 
-## Como Usar
+### Dados iniciais
+O trabalho inicializa com 6 livros, 1 bibliotecário, 3 estudantes e 1 professor.
 
-Para usar o programa, siga as instruções apresentadas no console:
+## Autora
+Bruna Caroliny Custódio da Silva
 
-1. Escolha a operação desejada digitando o número correspondente no menu principal.
-2. Siga as instruções fornecidas pelo programa para cada operação selecionada.
-3. Para operações que exigem a entrada de dados do usuário, como adicionar livros, realizar empréstimos, cadastrar usuários, entre outras, siga as instruções específicas fornecidas pelo programa.
 
-## Requisitos
 
-- Java Development Kit (JDK) instalado no sistema.
-- Ambiente de desenvolvimento Java configurado (por exemplo, IntelliJ IDEA, Eclipse).
 
-## Como Executar
 
-1. Clone ou baixe o repositório do projeto.
-2. Abra o projeto em seu ambiente de desenvolvimento Java.
-3. Execute a classe `Main.java` para iniciar o programa.
-4. Siga as instruções apresentadas no console para interagir com o sistema.
+
+
 
 

@@ -1,335 +1,222 @@
 import model.*;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.List;
 
 public class Main {
-    private static TipoUsuario tipoUsuario;
-
-    public static void main(String[] args) throws Exception {
+    private static BancoDAO bd;
+    public static void main(String[] args) {
         Operacoes operacoes = Operacoes.getInstance();
-        Bibliotecario bibliotecario = new Bibliotecario("Ana", "11223344556", "B789", "1990-12-25", "ana_biblio", "senha123");
-        operacoes.adicionarUsuario(bibliotecario);
-        Bibliotecario loginBibliotecario = operacoes.loginBibliotecario("ana_biblio", "senha123");
+        bd = BancoDAO.getInstance();
+
+        bd.lerArquivo();
+        Usuario bibliotecario = new Bibliotecario("Cleide", "12345678901", "001", "01/01/1970", "admin", "senha123");
+        Usuario estudante1 = new Estudante("João", "111", "002", "02/02/2000");
+        Usuario estudante2 = new Estudante("Maria", "222", "003", "03/03/2001");
+        Usuario professor3 = new Professor("Pedro", "333", "004", "04/04/2002", "História");
+        Usuario professor4 = new Professor("Ana", "444", "005", "05/05/2003", "Artes");
+        Usuario estudante5 = new Estudante("Lucas", "555", "006", "06/06/2004");
+
+        bd.carregarUsuario(bibliotecario);
+        bd.carregarUsuario(estudante1);
+        bd.carregarUsuario(estudante2);
+        bd.carregarUsuario(professor3);
+        bd.carregarUsuario(professor4);
+        bd.carregarUsuario(estudante5);
+
+        operacoes.adicionarUsuario(estudante1);
+        operacoes.adicionarUsuario(estudante2);
+        operacoes.adicionarUsuario(professor3);
+        operacoes.adicionarUsuario(professor4);
+        operacoes.adicionarUsuario(estudante5);
+
+        ArrayList<Usuario> usuarios = bd.getUsuarios();
+
+        bd.salvarArquivo(usuarios);
+
+        Livro livro1 = new Livro("Barbie", "Mattel", "Moda e Magia", 2000, 5);
+        Livro livro2 = new Livro("Mickey Mouse", "Walt Disney", "Desenho", 2005, 3);
+        Livro livro3 = new Livro("Harry Potter", "J.K. Rowling", "Fantasia", 1997, 10);
+        Livro livro4 = new Livro("Dom Quixote", "Miguel de Cervantes", "Literatura Clássica", 1605, 8);
+        Livro livro5 = new Livro("O Senhor dos Anéis", "J.R.R. Tolkien", "Fantasia Épica", 1954, 7);
+        Livro livro6 = new Livro("A Culpa é das Estrelas", "John Green", "Romance", 2012, 6);
+
+        operacoes.adicionarLivro(livro1);
+        operacoes.adicionarLivro(livro2);
+        operacoes.adicionarLivro(livro3);
+        operacoes.adicionarLivro(livro4);
+
+
         Scanner scanner = new Scanner(System.in);
 
-        //if (loginBibliotecario == null) {
-        //    System.out.println("Falha na autenticação. Encerrando o programa.");
-        //    return;
-        //}
-
-        while (true) {
-            exibirMenu();
-
-            int opcao = scanner.nextInt();
-            scanner.nextLine(); // Consumir a quebra de linha pendente
-
-            switch (opcao) {
-                case 1:
-                    adicionarLivro(operacoes, scanner);
-                    break;
-                case 2:
-                    removerLivro(operacoes, scanner);
-                    break;
-                case 3:
-                    realizarEmprestimo(scanner, operacoes);
-                    break;
-                case 4:
-                    realizarDevolucao(operacoes, scanner);
-                    break;
-                case 5:
-                    buscarLivro(operacoes, scanner);
-                    break;
-                case 6:
-                    listarEmprestimosAtivos(operacoes, scanner);
-                    break;
-                case 7:
-                    cadastrarUsuario(operacoes, scanner);
-                    break;
-                case 8:
-                    System.out.println("Saindo do sistema.");
-                    return;
-                default:
-                    System.out.println("Opção inválida. Tente novamente.");
-                    break;
-            }
-        }
-    }
-
-
-    private static void cadastrarUsuario(Operacoes operacoes, Scanner scanner) {
-        System.out.println("\nCadastro de Usuário");
-        System.out.println("Selecione o tipo de usuário:");
-        System.out.println("1. Estudante");
-        System.out.println("2. Professor");
-        System.out.println("3. Bibliotecário");
-        System.out.print("Escolha o tipo de usuário a ser cadastrado: ");
-
-        int tipoUsuario = scanner.nextInt();
-        scanner.nextLine(); // Consumir a quebra de linha pendente
-
-        switch (tipoUsuario) {
-            case 1:
-                cadastrarEstudante(operacoes, scanner);
-                break;
-            case 2:
-                cadastrarProfessor(operacoes, scanner);
-                break;
-            case 3:
-                cadastrarBibliotecario(operacoes, scanner);
-                break;
-            default:
-                System.out.println("Tipo de usuário inválido.");
-                break;
-        }
-    }
-
-    private static void cadastrarEstudante(Operacoes operacoes, Scanner scanner) {
-        System.out.print("Nome do Estudante: ");
-        String nome = scanner.nextLine().trim();
-
-        System.out.print("CPF do Estudante: ");
-        String cpf = scanner.nextLine().trim();
-
-        System.out.print("Matrícula do Estudante: ");
-        String matricula = scanner.nextLine().trim();
-
-        System.out.print("Data de Nascimento do Estudante: ");
-        String dataNascimento = scanner.nextLine().trim();
-
-        // Criar o objeto Estudante
-        Usuario estudante = new Estudante(nome, cpf, matricula, dataNascimento, TipoUsuario.ESTUDANTE);
-
-        // Adicionar o estudante através das operações
-        operacoes.adicionarUsuario(estudante);
-
-        System.out.println("Estudante cadastrado com sucesso!");
-    }
-
-    private static void cadastrarProfessor(Operacoes operacoes, Scanner scanner) {
-        System.out.print("Nome do Professor: ");
-        String nome = scanner.nextLine().trim();
-
-        System.out.print("CPF do Professor: ");
-        String cpf = scanner.nextLine().trim();
-
-        System.out.print("Matrícula do Professor: ");
-        String matricula = scanner.nextLine().trim();
-
-        System.out.print("Data de Nascimento do Professor: ");
-        String dataNascimento = scanner.nextLine().trim();
-
-        System.out.print("Departamento do Professor: ");
-        String departamento = scanner.nextLine().trim();
-
-        // Criar o objeto Professor
-        Usuario professor = new Professor(nome, cpf, matricula, dataNascimento, departamento);
-
-        // Adicionar o professor através das operações
-        operacoes.adicionarUsuario(professor);
-
-        System.out.println("Professor cadastrado com sucesso!");
-    }
-
-    private static void cadastrarBibliotecario(Operacoes operacoes, Scanner scanner) {
-        System.out.print("Nome do Bibliotecário: ");
-        String nome = scanner.nextLine().trim();
-
-        System.out.print("CPF do Bibliotecário: ");
-        String cpf = scanner.nextLine().trim();
-
-        System.out.print("Matrícula do Bibliotecário: ");
-        String matricula = scanner.nextLine().trim();
-
-        System.out.print("Data de Nascimento do Bibliotecário: ");
-        String dataNascimento = scanner.nextLine().trim();
-
-        System.out.print("Login do Bibliotecário: ");
-        String login = scanner.nextLine().trim();
-
-        System.out.print("Senha do Bibliotecário: ");
-        String senha = scanner.nextLine().trim();
-
-        // Criar o objeto Bibliotecário
-        Bibliotecario bibliotecario = new Bibliotecario(nome, cpf, matricula, dataNascimento, login, senha);
-
-        // Adicionar o bibliotecário através das operações
-        operacoes.adicionarUsuario(bibliotecario);
-
-        System.out.println("Bibliotecário cadastrado com sucesso!");
-    }
-
-    private static Bibliotecario autenticarBibliotecario(Operacoes operacoes) throws Exception {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Autenticação de Bibliotecário");
         System.out.print("Login: ");
-        String login = scanner.nextLine().trim();
-
+        String login = scanner.nextLine();
         System.out.print("Senha: ");
-        String senha = scanner.nextLine().trim();
+        String senha = scanner.nextLine();
 
-        return operacoes.loginBibliotecario(login, senha);
+        try {
+            if (operacoes.loginBibliotecario(login, senha)) {
+                System.out.println("Login realizado com sucesso!");
+
+                int opcao;
+                do {
+                    exibirMenu();
+                    opcao = scanner.nextInt();
+                    scanner.nextLine();
+                    bd.salvarArquivo("biblioteca.bin", bd.getUsuarios());
+                    bd.salvarArquivo("biblioteca.bin", bd.getLivros());
+
+                    switch (opcao) {
+                        case 1:
+                            adicionarLivro(operacoes, scanner);
+                            break;
+                        case 2:
+                            realizarEmprestimo(operacoes, scanner);
+                            break;
+                        case 3:
+                            realizarDevolucao(operacoes, scanner);
+                            break;
+                        case 4:
+                            pesquisarLivro(operacoes, scanner);
+                            break;
+                        case 5:
+                            excluirLivro(operacoes, scanner);
+                            break;
+                        case 6:
+                            verificarSituacaoUsuario(operacoes, scanner);
+                            break;
+                        case 7:
+                            listarEmprestimosUsuario(operacoes, scanner);
+                            break;
+                        case 0:
+                            System.out.println("Desligando...");
+                            break;
+                        default:
+                            System.out.println("Opção inexistente. Digite novamente.");
+                    }
+                } while (opcao != 0);
+
+            } else {
+                System.out.println("Login ou senha incorretos.");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            scanner.close();
+        }
     }
+
 
     private static void exibirMenu() {
-        System.out.println("\nSistema de Biblioteca");
-        System.out.println("1. Adicionar Livro");
-        System.out.println("2. Remover Livro");
-        System.out.println("3. Realizar Empréstimo");
-        System.out.println("4. Realizar Devolução");
-        System.out.println("5. Buscar Livro");
-        System.out.println("6. Listar Empréstimos Ativos de um Usuário");
-        System.out.println("7. Cadastrar Usuário");
-        System.out.println("8. Sair");
+        System.out.println("\n### Menu Bibliotecária ###");
+        System.out.println("1. Adicionar livro");
+        System.out.println("2. Realizar empréstimo");
+        System.out.println("3. Realizar devolução");
+        System.out.println("4. Pesquisar livro por título");
+        System.out.println("5. Excluir livro");
+        System.out.println("6. Verificar situação do usuário por CPF");
+        System.out.println("7. Listar empréstimos ativos de um usuário por CPF");
+        System.out.println("0. Sair");
         System.out.print("Escolha uma opção: ");
     }
 
-
-
     private static void adicionarLivro(Operacoes operacoes, Scanner scanner) {
-        System.out.println("\nAdicionar Livro");
-
-        System.out.print("Digite o título do livro: ");
+        System.out.print("Informe o título do livro: ");
         String titulo = scanner.nextLine();
-
-        System.out.print("Digite o autor do livro: ");
+        System.out.print("Informe o autor do livro: ");
         String autor = scanner.nextLine();
-
-        System.out.print("Digite o ano de lançamento do livro: ");
-        int anoLancamento = scanner.nextInt();
-        scanner.nextLine(); // Limpa o buffer do scanner
-
-        System.out.print("Digite o assunto do livro: ");
+        System.out.print("Informe o assunto do livro: ");
         String assunto = scanner.nextLine();
+        System.out.print("Informe o ano de publicação do livro: ");
+        int anoPublicacao = scanner.nextInt();
+        System.out.print("Informe a quantidade de cópias do livro: ");
+        int quantidadeCopias = scanner.nextInt();
 
-        System.out.print("Digite a quantidade em estoque do livro: ");
-        int qtdEstoque = scanner.nextInt();
-        scanner.nextLine(); // Limpa o buffer do scanner
-
-        Livro livro = new Livro(titulo, autor, assunto, anoLancamento, qtdEstoque);
-        operacoes.adicionarLivro(livro);
-
-        System.out.println("Livro adicionado com sucesso!");
+        Livro novoLivro = new Livro(titulo, autor, assunto, anoPublicacao, quantidadeCopias);
+        operacoes.adicionarLivro(novoLivro);
+        System.out.println("Livro adicionado com sucesso: " + novoLivro.getTitulo());
     }
 
-    private static void removerLivro(Operacoes operacoes, Scanner scanner) {
-        System.out.println("\nRemover Livro");
-
-        System.out.print("Digite o título do livro a ser removido: ");
-        String titulo = scanner.nextLine();
-
-        Livro livroEncontrado = operacoes.buscarLivroPorTitulo(titulo);
-
-        if (livroEncontrado == null) {
-            System.out.println("Livro não encontrado.");
-        } else {
-            operacoes.removerLivro(livroEncontrado);
-            System.out.println("Livro removido com sucesso!");
-        }
-    }
-
-    private static void realizarEmprestimo(Scanner scanner, Operacoes operacoes) {
-        System.out.println("\nRealizar Empréstimo");
-
-        System.out.print("Informe o CPF do usuário: ");
-        String cpf = scanner.nextLine();
-
-        Usuario usuario = operacoes.buscarUsuarioPorCpf(cpf);
-        if (usuario == null) {
-            System.out.println("Usuário não encontrado.");
-            return;
-        }
-
-        System.out.print("Informe o título do livro que deseja emprestar: ");
+    private static void realizarEmprestimo(Operacoes operacoes, Scanner scanner) {
+        System.out.print("Informe o título do livro para empréstimo: ");
         String tituloLivro = scanner.nextLine();
-
-        Livro livro = operacoes.buscarLivroPorTitulo(tituloLivro);
-        if (livro == null) {
-            System.out.println("Livro não encontrado.");
-            return;
-        }
+        System.out.print("Informe o CPF do usuário para empréstimo: ");
+        String cpfUsuario = scanner.nextLine();
 
         try {
-            operacoes.realizarEmprestimo(livro, usuario);
+            Livro livro = operacoes.buscarLivroPorTitulo(tituloLivro);
+            Usuario usuario = operacoes.buscarUsuarioPorCpf(cpfUsuario);
+
+            if (livro != null && usuario != null) {
+                operacoes.realizarEmprestimo(livro, usuario);
+                System.out.println("Empréstimo realizado com sucesso: " + livro.getTitulo() + " para " + usuario.getNome());
+            } else {
+                System.out.println("Livro ou usuário não encontrado.");
+            }
         } catch (Exception e) {
-            System.out.println("Erro ao realizar empréstimo: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
     private static void realizarDevolucao(Operacoes operacoes, Scanner scanner) {
-        System.out.println("\nRealizar Devolução");
+        System.out.print("Informe o título do livro para devolução: ");
+        String tituloLivro = scanner.nextLine();
+        System.out.print("Informe o CPF do usuário para devolução: ");
+        String cpfUsuario = scanner.nextLine();
 
-        System.out.print("Digite o título do livro a ser devolvido: ");
+        Livro livro = operacoes.buscarLivroPorTitulo(tituloLivro);
+        Usuario usuario = operacoes.buscarUsuarioPorCpf(cpfUsuario);
+
+        Emprestimo emprestimo = operacoes.buscarEmprestimo(livro, usuario);
+        operacoes.realizarDevolucao(emprestimo);
+    }
+
+    private static void pesquisarLivro(Operacoes operacoes, Scanner scanner) {
+        System.out.print("Informe o título do livro para pesquisa: ");
         String tituloLivro = scanner.nextLine();
 
         Livro livro = operacoes.buscarLivroPorTitulo(tituloLivro);
 
-        if (livro == null) {
-            System.out.println("Livro não encontrado.");
-            return;
-        }
+        System.out.println("Livro encontrado: " + livro.getTitulo());
 
-        Emprestimo emprestimo = null;
-        for (Emprestimo emp : operacoes.getEmprestimos()) {
-            if (emp.getLivro().equals(livro)) {
-                emprestimo = emp;
-                break;
-            }
-        }
-
-        if (emprestimo == null) {
-            System.out.println("Livro não está emprestado.");
-            return;
-        }
-
-        operacoes.realizarDevolucao(emprestimo);
-        System.out.println("Devolução realizada com sucesso!");
     }
 
-    private static void buscarLivro(Operacoes operacoes, Scanner scanner) {
-        System.out.println("\nBuscar Livro");
-
-        System.out.print("Digite o nome do arquivo (.txt) com os títulos de livros: ");
-        String nomeArquivo = scanner.nextLine();
-
-        System.out.print("Digite o título do livro que deseja buscar: ");
+    private static void excluirLivro(Operacoes operacoes, Scanner scanner) {
+        System.out.print("Informe o título do livro para exclusão: ");
         String tituloLivro = scanner.nextLine();
 
-        Livro livroEncontrado = operacoes.buscarLivroPorNomeArquivo(nomeArquivo, tituloLivro);
-
-        if (livroEncontrado == null) {
-            System.out.println("Livro não encontrado no arquivo.");
+        Livro livro = operacoes.buscarLivroPorTitulo(tituloLivro);
+        if (livro != null) {
+            operacoes.removerLivro(livro);
+            System.out.println("Livro removido com sucesso: " + livro.getTitulo());
         } else {
-            System.out.println("Livro encontrado:");
-            System.out.println(livroEncontrado);
+            System.out.println("Livro não encontrado.");
         }
     }
 
+    private static void verificarSituacaoUsuario(Operacoes operacoes, Scanner scanner) {
+        System.out.print("Informe o CPF do usuário para verificação: ");
+        String cpfUsuario = scanner.nextLine();
 
-    private static void listarEmprestimosAtivos(Operacoes operacoes, Scanner scanner) {
-        System.out.println("\nListar Empréstimos Ativos de um Usuário");
+        Usuario usuario = operacoes.buscarUsuarioPorCpf(cpfUsuario);
 
-        System.out.print("Digite o CPF do usuário: ");
-        String cpf = scanner.nextLine();
+        System.out.println("Usuário encontrado: " + usuario.getNome());
 
-        Usuario usuario = operacoes.buscarUsuarioPorCpf(cpf);
+    }
 
-        if (usuario == null) {
-            System.out.println("Usuário não encontrado.");
-            return;
-        }
+    private static void listarEmprestimosUsuario(Operacoes operacoes, Scanner scanner) {
+        System.out.print("Informe o CPF do usuário para listar empréstimos ativos: ");
+        String cpfUsuario = scanner.nextLine();
 
-        List<Emprestimo> emprestimosAtivos = operacoes.listarEmprestimosAtivosUsuario(usuario);
-
-        if (emprestimosAtivos.isEmpty()) {
-            System.out.println("Usuário não possui empréstimos ativos.");
-        } else {
-            System.out.println("Empréstimos ativos do usuário:");
-            for (Emprestimo emp : emprestimosAtivos) {
-                System.out.println(emp);
+        Usuario usuario = operacoes.buscarUsuarioPorCpf(cpfUsuario);
+        if (usuario != null) {
+            for (Emprestimo emprestimo : operacoes.listarEmprestimosUsuario(usuario)) {
+                System.out.println("Empréstimo ativo: " + emprestimo.getLivro().getTitulo());
             }
+        }
+        else {
+            System.out.println("Usuário não encontrado.");
         }
     }
 }

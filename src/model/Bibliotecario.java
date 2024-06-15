@@ -1,11 +1,16 @@
 package model;
 
-public class Bibliotecario extends Usuario {
+import java.io.Serializable;
+
+public class Bibliotecario extends Usuario implements Serializable{
     private String login;
     private String senha;
 
+    public  Bibliotecario(){
+    }
+
     public Bibliotecario(String nome, String cpf, String matricula, String dataNascimento, String login, String senha) {
-        super(nome, cpf, matricula, dataNascimento, TipoUsuario.BIBLIOTECARIO);
+        super(nome, cpf, matricula, dataNascimento);
         this.login = login;
         this.senha = senha;
     }

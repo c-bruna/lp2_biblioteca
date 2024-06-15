@@ -2,63 +2,88 @@ package model;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class BancoDAO {
     private static BancoDAO instance;
-    private List<Usuario> usuarios;
-    private List<Livro> livros;
-    private List<Emprestimo> emprestimos;
+    ArrayList<Usuario> usuarios;
+    ArrayList<Usuario> usuariosLidos;
+    ArrayList<Livro> livros;
+    ArrayList<Emprestimo> emprestimos;
 
     private BancoDAO() {
         usuarios = new ArrayList<>();
+        usuariosLidos = new ArrayList<>();
         livros = new ArrayList<>();
         emprestimos = new ArrayList<>();
-        carregarDados();
     }
 
-    public static synchronized BancoDAO getInstance() {
+    public static BancoDAO getInstance() {
         if (instance == null) {
             instance = new BancoDAO();
         }
         return instance;
     }
 
-    public List<Usuario> getUsuarios() {
+    public void salvarArquivo(String nomeArquivo, Object objeto) {
+        try (FileOutputStream arquivoSaida = new FileOutputStream(nomeArquivo);
+             ObjectOutputStream saida = new ObjectOutputStream(arquivoSaida)) {
+            saida.writeObject(objeto);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public void carregarUsuario(Usuario usuario){
+        usuarios.add(usuario);
+    }
+
+    public void salvarArquivo1() {
+        try (FileOutputStream arquivoSaida = new FileOutputStream("arquivo.bin");
+             ObjectOutputStream saida = new ObjectOutputStream(arquivoSaida)) {
+            saida.writeObject(usuarios);
+            System.out.println("Arquivo binário gerado com sucesso.");
+        } catch (IOException e) {
+            System.err.println("Erro ao salvar arquivo binário: " + e.getMessage());
+        }
+    }
+
+    public void salvarArquivo(ArrayList<Usuario> p) {
+        try {
+            FileOutputStream arquivoSaida = new FileOutputStream("arquivo.bin");
+            ObjectOutputStream saida = new ObjectOutputStream(arquivoSaida);
+            saida.writeObject(p);
+            saida.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void lerArquivo() {
+        try {
+            FileInputStream arquivoLeitura = new FileInputStream("arquivo.bin");
+            ObjectInputStream entrada = new ObjectInputStream(arquivoLeitura);
+            usuarios = (ArrayList<Usuario>) entrada.readObject();
+            entrada.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("Arquivo não encontrado: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Erro de leitura: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.err.println("Classe não encontrada: " + e.getMessage());
+        }
+    }
+
+
+    public ArrayList<Usuario> getUsuarios() {
         return usuarios;
     }
 
-    public List<Livro> getLivros() {
+    public ArrayList<Livro> getLivros() {
         return livros;
     }
 
-    public List<Emprestimo> getEmprestimos() {
+    public ArrayList<Emprestimo> getEmprestimos() {
         return emprestimos;
     }
 
-    public void salvarDados() throws IOException {
-        try (ObjectOutputStream oosUsuarios = new ObjectOutputStream(new FileOutputStream("usuarios.dat"));
-             ObjectOutputStream oosLivros = new ObjectOutputStream(new FileOutputStream("livros.dat"));
-             ObjectOutputStream oosEmprestimos = new ObjectOutputStream(new FileOutputStream("emprestimos.dat"))) {
-
-            oosUsuarios.writeObject(usuarios);
-            oosLivros.writeObject(livros);
-            oosEmprestimos.writeObject(emprestimos);
-        }
-    }
-
-    public void carregarDados() {
-        try (ObjectInputStream oisUsuarios = new ObjectInputStream(new FileInputStream("usuarios.dat"));
-             ObjectInputStream oisLivros = new ObjectInputStream(new FileInputStream("livros.dat"));
-             ObjectInputStream oisEmprestimos = new ObjectInputStream(new FileInputStream("emprestimos.dat"))) {
-
-            usuarios = (List<Usuario>) oisUsuarios.readObject();
-            livros = (List<Livro>) oisLivros.readObject();
-            emprestimos = (List<Emprestimo>) oisEmprestimos.readObject();
-        } catch (FileNotFoundException e) {
-            System.out.println("Arquivo não encontrado: " + e.getMessage());
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Erro ao carregar dados: " + e.getMessage());
-        }
-    }
 }

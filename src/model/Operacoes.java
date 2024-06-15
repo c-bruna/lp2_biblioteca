@@ -1,14 +1,12 @@
 package model;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Operacoes {
     private static Operacoes instance;
+    private BancoDAO bancoDAO;
 
     private List<Livro> livros;
     private List<Usuario> usuarios;
@@ -19,6 +17,7 @@ public class Operacoes {
         livros = new ArrayList<>();
         usuarios = new ArrayList<>();
         emprestimos = new ArrayList<>();
+        bancoDAO = BancoDAO.getInstance();
     }
 
     public static Operacoes getInstance() {
@@ -28,28 +27,30 @@ public class Operacoes {
         return instance;
     }
 
-    public Bibliotecario loginBibliotecario(String login, String senha) throws Exception {
-        boolean loginBiblio = false;
-        for (Usuario usuario : usuarios) {
+    public boolean loginBibliotecario(String login, String senha) throws Exception {
+        System.out.println("Login recebido: " + login);
+        System.out.println("Senha recebida: " + senha);
+        for (Usuario usuario : bancoDAO.getUsuarios()) {
             if (usuario instanceof Bibliotecario) {
-                Bibliotecario biblio = (Bibliotecario) usuario;
-                if (biblio.getLogin().equals(login) && biblio.getSenha().equals(senha)) {
-                    loginBibliotecario = biblio;
-                    loginBiblio = true;
-                    break;
+                Bibliotecario bibliotecario = (Bibliotecario) usuario;
+                System.out.println(bibliotecario.getLogin());
+                if (bibliotecario.getLogin().equals(login) && bibliotecario.getSenha().equals(senha)) {
+                    return true;
                 }
             }
         }
 
-        if (!loginBiblio) {
-            throw new Exception("Bibliotecário não encontrado ou senha incorreta.");
-        }
-        return null;
+        throw new Exception("Login ou senha incorretos.");
+    }
+
+    public void adicionarUsuario(Usuario usuario) {
+        usuarios.add(usuario);
     }
 
     public void adicionarLivro(Livro livro) {
         livros.add(livro);
     }
+
 
     public void removerLivro(Livro livro) {
         livros.remove(livro);
@@ -64,46 +65,29 @@ public class Operacoes {
         return null;
     }
 
-    public Livro buscarLivroPorNomeArquivo(String nomeArquivo, String nomeLivro) {
-        try (BufferedReader br = new BufferedReader(new FileReader(nomeArquivo))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.equalsIgnoreCase(nomeLivro)) {
-                    return new Livro(line, "", "", 0, 0); // Retornar o livro encontrado (dados básicos)
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Erro ao ler o arquivo: " + e.getMessage());
+    public void listarUsuarios() {
+        System.out.println("Lista de usuários:");
+        for (Usuario usuario : bancoDAO.getUsuarios()) {
+            System.out.println(usuario.getNome() + " " + usuario.getCpf());
         }
-        return null;
     }
 
-    public Livro buscarLivroPorAutor(String autor) {
-        for (Livro livro : livros) {
-            if (livro.getAutor().equalsIgnoreCase(autor)) {
-                return livro;
-            }
-        }
-        return null;
-    }
-
-    public boolean realizarEmprestimo(Livro livro, Usuario usuario) throws Exception{
+    public boolean realizarEmprestimo(Livro livro, Usuario usuario) throws Exception {
         if (livro.getLivroEmprestado() != LivroEmprestado.DISPONIVEL) {
             throw new Exception("Livro não disponível para empréstimo.");
         }
 
-        if (usuario.getPerfil() == TipoUsuario.ESTUDANTE && usuario.getEmprestimos().size() >= 3) {
+        if (usuario instanceof Estudante && usuario.getEmprestimos().size() >= 3) {
             throw new Exception("Estudante já atingiu o limite de empréstimos.");
         }
 
-        if ((usuario.getPerfil() == TipoUsuario.PROFESSOR || usuario.getPerfil() == TipoUsuario.BIBLIOTECARIO) &&
-                usuario.getEmprestimos().size() >= 5) {
-            throw new Exception("Professor/Bibliotecário já atingiu o limite de empréstimos.");
+        if ((usuario instanceof Professor || usuario instanceof Bibliotecario) && usuario.getEmprestimos().size() >= 5) {
+            throw new Exception("Já atingiu o limite de empréstimos.");
         }
 
         LocalDate dataEmprestimo = LocalDate.now();
         LocalDate dataDevolucaoPrevista;
-        if (usuario.getPerfil() == TipoUsuario.ESTUDANTE) {
+        if (usuario instanceof Estudante) {
             dataDevolucaoPrevista = dataEmprestimo.plusDays(15);
         } else {
             dataDevolucaoPrevista = dataEmprestimo.plusDays(30);
@@ -117,6 +101,7 @@ public class Operacoes {
         return true;
     }
 
+
     public void realizarDevolucao(Emprestimo emprestimo) {
         Livro livroDevolvido = emprestimo.getLivro();
         Usuario usuario = emprestimo.getUsuario();
@@ -125,7 +110,16 @@ public class Operacoes {
         emprestimos.remove(emprestimo);
     }
 
-    public List<Emprestimo> listarEmprestimosAtivosUsuario(Usuario usuario) {
+    public Emprestimo buscarEmprestimo(Livro livro, Usuario usuario) {
+        for (Emprestimo emprestimo : emprestimos) {
+            if (emprestimo.getLivro().equals(livro) && emprestimo.getUsuario().equals(usuario)) {
+                return emprestimo;
+            }
+        }
+        return null;
+    }
+
+    public List<Emprestimo> listarEmprestimosUsuario(Usuario usuario) {
         List<Emprestimo> emprestimosAtivos = new ArrayList<>();
         for (Emprestimo emprestimo : emprestimos) {
             if (emprestimo.getUsuario().equals(usuario)) {
@@ -135,9 +129,6 @@ public class Operacoes {
         return emprestimosAtivos;
     }
 
-    public void adicionarUsuario(Usuario usuario) {
-        usuarios.add(usuario);
-    }
 
     public Usuario buscarUsuarioPorCpf(String cpf) {
         for (Usuario usuario : usuarios) {
@@ -148,9 +139,6 @@ public class Operacoes {
         return null;
     }
 
-    public void removerUsuario(Usuario usuario) {
-        usuarios.remove(usuario);
-    }
 
     public List<Livro> getLivros() {
         return livros;

@@ -3,10 +3,10 @@ package model;
 // e Bibliotecário
 public class Pessoa {
 
-    private String cpf;
-    private String matricula;
-    private String nome;
-    private String dataNascimento;
+    public String cpf;
+    public String matricula;
+    public String nome;
+    public String dataNascimento;
 
     // Construtor
     public Pessoa(String nome, String cpf, String matricula, String dataNascimento) {
@@ -14,6 +14,10 @@ public class Pessoa {
         this.cpf = cpf;
         this.matricula = matricula;
         this.dataNascimento = dataNascimento;
+    }
+
+    public Pessoa() {
+
     }
 
     // Getters e Setters

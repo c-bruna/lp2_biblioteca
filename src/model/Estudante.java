@@ -1,10 +1,12 @@
 package model;
 
-public class Estudante extends Usuario {
+import java.io.Serializable;
+
+public class Estudante extends Usuario implements Serializable {
     private String curso;
 
-    public Estudante(String nome, String cpf, String matricula, String dataNascimento, TipoUsuario curso) {
-        super(nome, cpf, matricula, dataNascimento, TipoUsuario.ESTUDANTE);
+    public Estudante(String nome, String cpf, String matricula, String dataNascimento) {
+        super(nome, cpf, matricula, dataNascimento);
         this.curso = String.valueOf(curso);
     }
 
